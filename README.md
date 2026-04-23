@@ -1,98 +1,87 @@
-# {{ cookiecutter.project_name }}
+# National Provider Directory Data Expectations
 
-{{ cookiecutter.project_description }}
+This directory contains InLaw-based data validation tests organized by FHIR resource type for use in the National Provider Directory Project
 
-## About the Project
+## Structure
 
-**{project_statement}**
+Each resource type has its own subdirectory containing:
+- `run_expectations.py` - Runner script that executes all tests in the directory
+- Individual validation test files (e.g., `validate_*.py`)
 
-<!---
-### Project Vision
-**{project vision}** -->
+## Current Validation Suites
 
-<!--
-### Project Mission
-**{project mission}** -->
+### Practitioner Expectations
 
-<!--
-### Agency Mission
-TODO: Good to include since this is an agency-led project -->
+Located in `practitioner_expectations/`
 
-<!--
-### Team Mission
-TODO: Good to include since this is an agency-led project -->
+Validates:
+- Row count is within expected range
+- NPI values are properly formatted (10 digits)
+- NPI values are unique (no duplicates)
+- Required fields are present (resource_uuid, last_name)
 
-<!--
-## Core Team
+**Run with:**
+```bash
+python dataexpectations/practitioner_expectations/run_expectations.py
+```
 
-A list of core team members responsible for the code and documentation in this repository can be found in [COMMUNITY.md](COMMUNITY.md).
--->
+## Creating New Validation Suites
 
-<!--
-## Repository Structure
+1. Create a new directory for the resource type:
+   ```bash
+   mkdir -p dataexpectations/resource_name_expectations
+   touch dataexpectations/resource_name_expectations/__init__.py
+   ```
 
-TODO: Including the repository structure helps viewers quickly understand the project layout. Using the "tree -d" command can be a helpful way to generate this information, but, be sure to update it as the project evolves and changes over time.
+2. Copy and adapt the runner script from `practitioner_expectations/run_expectations.py`
 
-**{list directories and descriptions}**
+3. Create validation test files following the InLaw pattern
 
-TODO: Add a 'table of contents" for your documentation. Tier 0/1 projects with simple README.md files without many sections may or may not need this, but it is still extremely helpful to provide "bookmark" or "anchor" links to specific sections of your file to be referenced in tickets, docs, or other communication channels.
+4. Run your validation suite:
+   ```bash
+   python dataexpectations/resource_name_expectations/run_expectations.py
+   ```
 
-**{list of .md at top directory and descriptions}**
+## Writing Validation Tests
 
--->
+Each validation test should:
+- Inherit from `InLaw`
+- Define a descriptive `title` attribute
+- Implement a `run(engine, config)` staticmethod
+- Return `True` for success or an error message string for failure
 
-<!---
-## Local Development
+Example:
+```python
+from src.utils.inlaw import InLaw
+from src.utils.dbtable import DBTable
 
- TODO - with example below:
-This project is monorepo with several apps. Please see the [api](./api/README.md) and [frontend](./frontend/README.md) READMEs for information on spinning up those projects locally. Also see the project [documentation](./documentation) for more info.
--->
+class ValidateMyData(InLaw):
+    title = "My data should meet criteria"
+    
+    @staticmethod
+    def run(engine, config=None):
+        if config is None:
+            return "SKIPPED: No config provided"
+        
+        my_table = DBTable(
+            schema=config['schema'],
+            table=config['my_table']
+        )
+        
+        sql = f"SELECT COUNT(*) AS count FROM {my_table} WHERE invalid_condition"
+        gx_df = InLaw.to_gx_dataframe(sql, engine)
+        
+        result = gx_df.expect_column_values_to_be_between(
+            column="count",
+            min_value=0,
+            max_value=0
+        )
+        
+        return True if result.success else "Validation failed"
+```
 
-<!--
-## Coding Style and Linters
+## Documentation
 
-TODO - Add the repo's linting and code style guidelines
-
-Each application has its own linting and testing guidelines. Lint and code tests are run on each commit, so linters and tests should be run locally before committing.
- -->
-
-<!---
-## Branching Model
-
-TODO - with example below:
-This project follows [trunk-based development](https://trunkbaseddevelopment.com/), which means:
-
-* Make small changes in [short-lived feature branches](https://trunkbaseddevelopment.com/short-lived-feature-branches/) and merge to `main` frequently.
-* Be open to submitting multiple small pull requests for a single ticket (i.e. reference the same ticket across multiple pull requests).
-* Treat each change you merge to `main` as immediately deployable to production. Do not merge changes that depend on subsequent changes you plan to make, even if you plan to make those changes shortly.
-* Ticket any unfinished or partially finished work.
-* Tests should be written for changes introduced, and adhere to the text percentage threshold determined by the project.
-
-This project uses **continuous deployment** using [Github Actions](https://github.com/features/actions) which is configured in the [./github/workflows](.github/workflows) directory.
-
-Pull-requests are merged to `main` and the changes are immediately deployed to the development environment. Releases are created to push changes to production.
--->
-
-## Policies
-
-### Open Source Policy
-
-We adhere to the [CMS Open Source Policy](https://github.com/CMSGov/cms-open-source-policy). If you have any questions, just [shoot us an email](mailto:opensource@cms.hhs.gov).
-
-### Security and Responsible Disclosure Policy
-
-_Submit a vulnerability:_ Vulnerability reports can be submitted through [Bugcrowd](https://bugcrowd.com/cms-vdp). Reports may be submitted anonymously. If you share contact information, we will acknowledge receipt of your report within 3 business days.
-
-### Software Bill of Materials (SBOM)
-
-A Software Bill of Materials (SBOM) is a formal record containing the details and supply chain relationships of various components used in building software.
-
-In the spirit of [Executive Order 14028 - Improving the Nation's Cyber Security](https://www.gsa.gov/technology/it-contract-vehicles-and-purchasing-programs/information-technology-category/it-security/executive-order-14028), a SBOM for this repository is provided here: https://github.com/{{ cookiecutter.project_org }}/{{ cookiecutter.project_repo_name }}/network/dependencies.
-
-For more information and resources about SBOMs, visit: https://www.cisa.gov/sbom.
-
-## Public domain
-
-This project is in the public domain within the United States, and copyright and related rights in the work worldwide are waived through the [CC0 1.0 Universal public domain dedication](https://creativecommons.org/publicdomain/zero/1.0/) as indicated in [LICENSE](LICENSE).
-
-All contributions to this project will be released under the CC0 dedication. By submitting a pull request or issue, you are agreeing to comply with this waiver of copyright interest.
+- See [../DATA_VALIDATION.md](../DATA_VALIDATION.md) for quick start guide
+- See [../AI_Instructions/InLaw.md](../AI_Instructions/InLaw.md) for detailed InLaw documentation
+- See [../AI_Instructions/DBTable.md](../AI_Instructions/DBTable.md) for DBTable documentation
