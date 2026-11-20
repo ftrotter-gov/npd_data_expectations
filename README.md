@@ -82,6 +82,23 @@ class ValidateMyData(InLaw):
 
 ## Documentation
 
-- See [../DATA_VALIDATION.md](../DATA_VALIDATION.md) for quick start guide
-- See [../AI_Instructions/InLaw.md](../AI_Instructions/InLaw.md) for detailed InLaw documentation
-- See [../AI_Instructions/DBTable.md](../AI_Instructions/DBTable.md) for DBTable documentation
+- See [DATA_VALIDATION.md](DATA_VALIDATION.md) for quick start guide
+- See [AI_Instructions/InLaw.md](AI_Instructions/InLaw.md) for detailed InLaw documentation
+- See [AI_Instructions/DBTable.md](AI_Instructions/DBTable.md) for DBTable documentation
+
+### FHIR Resource Modeling References
+
+- [AI_Instructions/ThreeLayerApproach.md](AI_Instructions/ThreeLayerApproach.md) - NDH/FHIR relational bridge architecture
+- [AI_Instructions/Practitioner.md](AI_Instructions/Practitioner.md) - Practitioner resource model
+- [AI_Instructions/PractionerRole.md](AI_Instructions/PractionerRole.md) - PractitionerRole resource model
+- [AI_Instructions/OrganizationClinical.md](AI_Instructions/OrganizationClinical.md) - Clinical Organization model
+- [AI_Instructions/OrganizationAffiliation.md](AI_Instructions/OrganizationAffiliation.md) - OrganizationAffiliation resource model
+- [AI_Instructions/Location.md](AI_Instructions/Location.md) - Location resource model
+- [AI_Instructions/Endpoint.md](AI_Instructions/Endpoint.md) - Endpoint resource model
+
+### Test Design References
+
+- [NeededExpectations.md](NeededExpectations.md) - The 17 core expectations
+- [AI_Instructions/OtherTests.md](AI_Instructions/OtherTests.md) - Proposed interoperability/trust tests
+- [AI_Instructions/PortInLaw.md](AI_Instructions/PortInLaw.md) - History of the InLaw port
+- [AI_Instructions/ReadMe.md](AI_Instructions/ReadMe.md) - Default AI tooling policy
